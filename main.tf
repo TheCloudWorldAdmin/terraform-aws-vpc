@@ -2,7 +2,7 @@
 # VPC
 ################################################################################
 
-resource "aws_vpc" "this" {
+resource "aws_vpc" "myVPC" {
   count = var.create_vpc ? 1 : 0
 
   cidr_block                       = var.cidr
@@ -13,16 +13,12 @@ resource "aws_vpc" "this" {
   enable_classiclink_dns_support   = var.enable_classiclink_dns_support
   assign_generated_ipv6_cidr_block = var.enable_ipv6
 
-  tags = merge(
-    {
-      "Name" = format("%s", var.name)
-    },
-    var.tags,
-    var.vpc_tags,
-  )
+  tags = {
+    Name = var.vpc_name
+  
 }
 
-resource "aws_vpc_ipv4_cidr_block_association" "this" {
+resource "aws_vpc_ipv4_cidr_block_association" "vpc_ipv4_cidr_association" {
   count = var.create_vpc && length(var.secondary_cidr_blocks) > 0 ? length(var.secondary_cidr_blocks) : 0
 
   vpc_id = aws_vpc.this[0].id
