@@ -23,26 +23,39 @@ locals {
 }
 
 resource "aws_vpc_ipv4_cidr_block_association" "vpc_ipv4_cidr_association" {
-  count = var.another_cidr ? length(var.secondary_cidr_blocks) : 0
+  count = var.another_cidr ? 1 : 0
 
-  vpc_id = aws_vpc.this[0].id
+  vpc_id = aws_vpc.myVPC.id
 
-  cidr_block = element(var.secondary_cidr_blocks, count.index)
+  cidr_block = var.secondary_cidr
+}
+
+################################################################################
+# Default security group
+################################################################################
+
+locals {
+  default_security_group_ingress = [{
+  description = "Ingress default security group"
+  from_port = var.ingress_from_port
+  to_port = var.ingress_to_port
+  protocol = var.ingress_protocol
+}]
 }
 
 resource "aws_default_security_group" "this" {
   count = var.create_vpc && var.manage_default_security_group ? 1 : 0
 
-  vpc_id = aws_vpc.this[0].id
+  vpc_id = aws_vpc.myVPC.id
 
   dynamic "ingress" {
     for_each = var.default_security_group_ingress
     content {
-      self             = lookup(ingress.value, "self", null)
-      cidr_blocks      = compact(split(",", lookup(ingress.value, "cidr_blocks", "")))
-      ipv6_cidr_blocks = compact(split(",", lookup(ingress.value, "ipv6_cidr_blocks", "")))
-      prefix_list_ids  = compact(split(",", lookup(ingress.value, "prefix_list_ids", "")))
-      security_groups  = compact(split(",", lookup(ingress.value, "security_groups", "")))
+      self             = 
+      cidr_blocks      = 
+      ipv6_cidr_blocks = 
+      prefix_list_ids  = 
+      security_groups  = 
       description      = lookup(ingress.value, "description", null)
       from_port        = lookup(ingress.value, "from_port", 0)
       to_port          = lookup(ingress.value, "to_port", 0)
