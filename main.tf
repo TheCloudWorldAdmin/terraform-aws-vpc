@@ -156,6 +156,8 @@ resource "aws_default_route_table" "default_route_table" {
   
   locals {
   default_route_table_routes = [{
+    cidr_block = var.cidr_block_default_route_table
+    ipv6_cidr_block = var.ipv6_cidr_block_route
     egress_only_gateway_id = var.egress_only_gateway_id_route
     gateway_id = var.gateway_id_route
     instance_id = var.instance_id_route
