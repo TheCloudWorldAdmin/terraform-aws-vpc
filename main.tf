@@ -43,7 +43,7 @@ locals {
     ipv6_cidr_blocks = var.ingress_ipv6_cidr_blocks
     prefix_list_ids = var.ingress_prefix_list_ids
     security_groups = var.ingress_security_groups
-}]
+}],
   default_security_group_egress = [{  
     description = "Ingress default security group"
     from_port = var.ingress_from_port
@@ -52,6 +52,7 @@ locals {
     ipv6_cidr_blocks = var.ingress_ipv6_cidr_blocks
     prefix_list_ids = var.ingress_prefix_list_ids
     security_groups = var.ingress_security_groups
+}]
 }
 
 resource "aws_default_security_group" "this" {
@@ -89,7 +90,9 @@ resource "aws_default_security_group" "this" {
     }
   }
 
-  tags = var.default_security_group_name
+  tags = {
+    "Name" = var.default_security_group_name
+}
 }
 
 ################################################################################
@@ -105,7 +108,9 @@ resource "aws_vpc_dhcp_options" "dhcp_options" {
   netbios_name_servers = var.dhcp_options_netbios_name_servers
   netbios_node_type    = var.dhcp_options_netbios_node_type
 
-  tags = var.dhcp_options_tag
+  tags = {
+    "Name" = var.dhcp_options_tag
+}
 }
 
 resource "aws_vpc_dhcp_options_association" "dhcp_options_association" {
@@ -119,43 +124,48 @@ resource "aws_vpc_dhcp_options_association" "dhcp_options_association" {
 # Internet Gateway
 ################################################################################
 
-resource "aws_internet_gateway" "this" {
-  count = var.create_vpc && var.create_igw && length(var.public_subnets) > 0 ? 1 : 0
+resource "aws_internet_gateway" "myIGW" {
+  count = var.create_vpc && var.create_igw && var.public_subnets > 0 ? 1 : 0
 
-  vpc_id = local.vpc_id
+  vpc_id = aws_vpc.myVPC.id
 
-  tags = merge(
-    {
-      "Name" = format("%s", var.name)
-    },
-    var.tags,
-    var.igw_tags,
-  )
+  tags = {
+    "Name" = var.igw_tag
 }
+}  
 
-resource "aws_egress_only_internet_gateway" "this" {
+resource "aws_egress_only_internet_gateway" "my_egress_IGW" {
   count = var.create_vpc && var.create_egress_only_igw && var.enable_ipv6 && local.max_subnet_length > 0 ? 1 : 0
 
-  vpc_id = local.vpc_id
+  vpc_id = aws_vpc.myVPC.id
 
-  tags = merge(
-    {
-      "Name" = format("%s", var.name)
-    },
-    var.tags,
-    var.igw_tags,
-  )
+ tags = {
+    "Name" = var.egress_igw_tag
 }
+} 
 
 ################################################################################
 # Default route
 ################################################################################
 
-resource "aws_default_route_table" "default" {
+resource "aws_default_route_table" "default_route_table" {
   count = var.create_vpc && var.manage_default_route_table ? 1 : 0
 
-  default_route_table_id = aws_vpc.this[0].default_route_table_id
+  default_route_table_id = aws_vpc.myVPC.default_route_table_id
   propagating_vgws       = var.default_route_table_propagating_vgws
+  
+  locals {
+  default_route_table_routes = [{
+    egress_only_gateway_id = var.egress_only_gateway_id_route
+    gateway_id = var.gateway_id_route
+    instance_id = var.instance_id_route
+    nat_gateway_id = var.nat_gateway_id_route
+    network_interface_id = var.network_interface_id_route
+    transit_gateway_id = var.transit_gateway_id_route
+    vpc_endpoint_id = var.vpc_endpoint_id_route
+    vpc_peering_connection_id = var.vpc_peering_connection_id_route
+  }]
+  }  
 
   dynamic "route" {
     for_each = var.default_route_table_routes
@@ -176,11 +186,8 @@ resource "aws_default_route_table" "default" {
     }
   }
 
-  tags = merge(
-    { "Name" = var.name },
-    var.tags,
-    var.default_route_table_tags,
-  )
+  tags = {
+    "Name" = var.default_route_table_tag
 }
 
 ################################################################################
