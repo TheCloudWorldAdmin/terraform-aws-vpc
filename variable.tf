@@ -53,4 +53,17 @@ variable "default_security_group_name" {}
 variable "enable_dhcp_options" {
   description = "Enable DHCP options.. True or False"
   type = bool
+  default = false
+}
+
+variable "manage_default_route_table" {
+  description = "Are we managing default route table"
+  type = bool
+  string = false
+}
+
+variable "default_route_table_propagating_vgws" {
+  description = "List of virtual gateways"
+  type = list(string)
+  default = ["",""]
 }
