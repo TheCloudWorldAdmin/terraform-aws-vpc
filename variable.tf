@@ -1,3 +1,9 @@
+variable "create_vpc" {
+  description = "Whether the VPC is getting created"
+  type = bool
+  default = false
+}
+
 variable "cidr" {}
 variable "instance_tenancy" {
   description = "Instance will be shared, dedicated and host. 'default' is shared"
@@ -67,3 +73,5 @@ variable "default_route_table_propagating_vgws" {
   type = list(string)
   default = ["",""]
 }
+
+variable "
