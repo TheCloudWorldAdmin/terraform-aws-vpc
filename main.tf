@@ -18,8 +18,12 @@ resource "aws_vpc" "myVPC" {
   
 }
 
+locals {
+  another_cidr = var.another_cidr
+}
+
 resource "aws_vpc_ipv4_cidr_block_association" "vpc_ipv4_cidr_association" {
-  count = var.create_vpc && length(var.secondary_cidr_blocks) > 0 ? length(var.secondary_cidr_blocks) : 0
+  count = var.another_cidr ? length(var.secondary_cidr_blocks) : 0
 
   vpc_id = aws_vpc.this[0].id
 
