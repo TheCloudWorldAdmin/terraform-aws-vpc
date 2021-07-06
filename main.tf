@@ -36,16 +36,22 @@ resource "aws_vpc_ipv4_cidr_block_association" "vpc_ipv4_cidr_association" {
 
 locals {
   default_security_group_ingress = [{
-  description = "Ingress default security group"
-  from_port = var.ingress_from_port
-  to_port = var.ingress_to_port
-  protocol = var.ingress_protocol
-  ipv6_cidr_blocks = var.ingress_ipv6_cidr_blocks
-  prefix_list_ids = var.ingress_prefix_list_ids
-  security_groups = var.ingress_security_groups
-},
-{ 
-  
+    description = "Ingress default security group"
+    from_port = var.ingress_from_port
+    to_port = var.ingress_to_port
+    protocol = var.ingress_protocol
+    ipv6_cidr_blocks = var.ingress_ipv6_cidr_blocks
+    prefix_list_ids = var.ingress_prefix_list_ids
+    security_groups = var.ingress_security_groups
+}]
+  default_security_group_egress = [{  
+    description = "Ingress default security group"
+    from_port = var.ingress_from_port
+    to_port = var.ingress_to_port
+    protocol = var.ingress_protocol
+    ipv6_cidr_blocks = var.ingress_ipv6_cidr_blocks
+    prefix_list_ids = var.ingress_prefix_list_ids
+    security_groups = var.ingress_security_groups
 }
 
 resource "aws_default_security_group" "this" {
@@ -72,10 +78,10 @@ resource "aws_default_security_group" "this" {
     for_each = var.default_security_group_egress
     content {
       self             = lookup(egress.value, "self", null)
-      cidr_blocks      = compact(split(",", lookup(egress.value, "cidr_blocks", "")))
-      ipv6_cidr_blocks = compact(split(",", lookup(egress.value, "ipv6_cidr_blocks", "")))
-      prefix_list_ids  = compact(split(",", lookup(egress.value, "prefix_list_ids", "")))
-      security_groups  = compact(split(",", lookup(egress.value, "security_groups", "")))
+      cidr_blocks      = lookup(egress.value, "cidr_blocks", null)
+      ipv6_cidr_blocks = lookup(egress.value, "ingress_ipv6_cidr_blocks", null)
+      prefix_list_ids  = lookup(egress.value, "prefix_list_ids", null)
+      security_groups  = lookup(egress.value, "security_groups", null)
       description      = lookup(egress.value, "description", null)
       from_port        = lookup(egress.value, "from_port", 0)
       to_port          = lookup(egress.value, "to_port", 0)
@@ -83,20 +89,14 @@ resource "aws_default_security_group" "this" {
     }
   }
 
-  tags = merge(
-    {
-      "Name" = format("%s", var.default_security_group_name)
-    },
-    var.tags,
-    var.default_security_group_tags,
-  )
+  tags = var.default_security_group_name
 }
 
 ################################################################################
 # DHCP Options Set
 ################################################################################
 
-resource "aws_vpc_dhcp_options" "this" {
+resource "aws_vpc_dhcp_options" "dhcp_options" {
   count = var.create_vpc && var.enable_dhcp_options ? 1 : 0
 
   domain_name          = var.dhcp_options_domain_name
@@ -105,20 +105,14 @@ resource "aws_vpc_dhcp_options" "this" {
   netbios_name_servers = var.dhcp_options_netbios_name_servers
   netbios_node_type    = var.dhcp_options_netbios_node_type
 
-  tags = merge(
-    {
-      "Name" = format("%s", var.name)
-    },
-    var.tags,
-    var.dhcp_options_tags,
-  )
+  tags = var.dhcp_options_tag
 }
 
-resource "aws_vpc_dhcp_options_association" "this" {
+resource "aws_vpc_dhcp_options_association" "dhcp_options_association" {
   count = var.create_vpc && var.enable_dhcp_options ? 1 : 0
 
-  vpc_id          = local.vpc_id
-  dhcp_options_id = aws_vpc_dhcp_options.this[0].id
+  vpc_id          = aws_vpc.myVPC.id
+  dhcp_options_id = aws_vpc_dhcp_options.dhcp_options.id
 }
 
 ################################################################################
