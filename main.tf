@@ -266,14 +266,14 @@ resource "aws_route" "private_ipv6_egress" {
 ################################################################################
 
 resource "aws_route_table" "public_route_table" {
-  count = var.create_vpc && length(var.public_subnets) > 0 ? 1 : 0
+  count = var.create_vpc ? 1 : 0
 
   vpc_id = aws_vpc.myVPC.id
 
   tags = {
     "Name" = var.public_route_table_tag
 }
-
+}
 resource "aws_route" "public_internet_gateway" {
   count = var.create_vpc && var.create_igw && length(var.public_subnets) > 0 ? 1 : 0
 
@@ -622,7 +622,7 @@ resource "aws_route_table_association" "database" {
 
   subnet_id = element(aws_subnet.database.*.id, count.index)
   route_table_id = element(
-    coalescelist(aws_route_table.database.*.id, aws_route_table.private.*.id),
+    aws_route_table.database.*.id
 #    var.create_database_subnet_route_table ? var.single_nat_gateway || var.create_database_internet_gateway_route ? 0 : count.index : count.index,
   )
 }
