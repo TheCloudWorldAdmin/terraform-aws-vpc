@@ -522,7 +522,7 @@ resource "aws_network_acl" "private" {
   tags = {
     "Name" = var.private_subnet_name
 }
-
+}
 resource "aws_network_acl_rule" "private_inbound" {
   count = var.create_vpc && var.private_dedicated_network_acl ? 1 : 0
 
