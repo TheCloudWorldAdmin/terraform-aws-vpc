@@ -391,7 +391,7 @@ data "aws_subnet" "subnet" {
 }
 
 output "subnet_cidr_blocks" {
-  value = [for s in data.aws_subnet.example : s.id]
+  value = [for s in data.aws_subnet.subnet : s.id]
 }
   
 resource "aws_db_subnet_group" "database_subnet_group" {
