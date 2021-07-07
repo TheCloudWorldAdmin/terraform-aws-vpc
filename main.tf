@@ -214,7 +214,7 @@ resource "aws_eip" "nat_eip" {
 }
 }
 locals {
-  total_ip = [aws_eip.nat_eip[count.index].id]
+  total_ip = aws_eip.nat_eip[count.index]
   total_subnets = [aws_subnet.private.*.id, aws_subnet.database.*.id]
 }
 resource "aws_nat_gateway" "my_nat" {
@@ -408,7 +408,7 @@ resource "aws_subnet" "database" {
   count = var.create_vpc ? var.database_subnets_count : 0
 
   vpc_id                          = aws_vpc.myVPC.id
-  cidr_block                      = var.database_subnets[count.index]
+  cidr_block                      = var.database_subnets
   availability_zone               = data.aws_availability_zones.available.names[count.index]
   assign_ipv6_address_on_creation = var.private_subnet_assign_ipv6_address_on_creation
 
@@ -591,10 +591,7 @@ resource "aws_route_table_association" "private_route_table_association" {
   count = var.create_vpc && var.private_route_table_association_required ? 1: 0
 
   subnet_id = element(aws_subnet.private.*.id, count.index)
-  route_table_id = element(
-    aws_route_table.private.*.id,
- #   var.single_nat_gateway ? 0 : count.index,
-  )
+  route_table_id = aws_route_table.private.*.id
 }
 
 
@@ -602,10 +599,7 @@ resource "aws_route_table_association" "database" {
  count = var.create_vpc && var.database_route_table_association_required ? 1: 0
 
   subnet_id = element(aws_subnet.database.*.id, count.index)
-  route_table_id = element(
-    aws_route_table.database.*.id
-#    var.create_database_subnet_route_table ? var.single_nat_gateway || var.create_database_internet_gateway_route ? 0 : count.index : count.index,
-  )
+  route_table_id = aws_route_table.database.*.id
 }
 
 
