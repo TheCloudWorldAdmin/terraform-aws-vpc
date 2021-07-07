@@ -646,11 +646,7 @@ resource "aws_default_vpc" "default_vpc" {
   enable_dns_hostnames = var.default_vpc_enable_dns_hostnames
   enable_classiclink   = var.default_vpc_enable_classiclink
 
-  tags = merge(
-    {
-      "Name" = format("%s", var.default_vpc_name)
-    },
-    var.tags,
-    var.default_vpc_tags,
-  )
+  tags = {
+    "Name" = var.default_vpc_tag
+}
 }
