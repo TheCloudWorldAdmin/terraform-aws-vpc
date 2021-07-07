@@ -216,6 +216,7 @@ resource "aws_eip" "nat_eip" {
 }
 locals {
   total_ip = [aws_eip.nat_eip.id]
+  total_subnets = [aws_subnet.private.*.id, aws_subnet.database.*.id]
 }
 resource "aws_nat_gateway" "my_nat" {
   count = var.create_vpc && var.enable_nat_gateway ? var.nat_gateway_count : 0
@@ -223,8 +224,8 @@ resource "aws_nat_gateway" "my_nat" {
   dynamic "eip_attach_nat" {
     for_each = local.total_ip
     association_id = local.total_ip
+    subnet_id = local.total_subnets
   }
-  subnet_id = aws_subnet.private.*.id
 
   tags = {
     "Name" = var.nat_gateway_tag
@@ -239,7 +240,7 @@ locals {
 resource "aws_route" "private_nat_gateway" {
   count = var.create_vpc && var.enable_nat_gateway ? var.nat_gateway_count : 0
 
-  route_table_id         = aws_route_table.private.*.id
+  route_table_id         = [aws_route_table.private.*.id, aws_subnet.database.*.id]
   destination_cidr_block = "0.0.0.0/0"
   dynamic "nat_attach_rt" {
     for_each = local.total_nat
@@ -259,71 +260,6 @@ resource "aws_route" "private_ipv6_egress" {
   egress_only_gateway_id      = element(aws_egress_only_internet_gateway.this.*.id, 0)
 }
 
-    ################################################################################
-# NAT Gateway Database
-################################################################################
-
-# Workaround for interpolation not being able to "short-circuit" the evaluation of the conditional branch that doesn't end up being used
-# Source: https://github.com/hashicorp/terraform/issues/11566#issuecomment-289417805
-#
-# The logical expression would be
-#
-#    nat_gateway_ips = var.reuse_nat_ips ? var.external_nat_ip_ids : aws_eip.nat.*.id
-#
-# but then when count of aws_eip.nat.*.id is zero, this would throw a resource not found error on aws_eip.nat.*.id.
-resource "aws_eip" "nat_eip" {
-  count = var.nat_gateway_count
-
-  vpc = true
-
-  tags = {
-    "Name" = var.nat_gateway_tag
-}
-}
-locals {
-  total_ip = [aws_eip.nat_eip.id]
-}
-resource "aws_nat_gateway" "my_nat" {
-  count = var.create_vpc && var.enable_nat_gateway ? var.nat_gateway_count : 0
-
-  dynamic "eip_attach_nat" {
-    for_each = local.total_ip
-    association_id = local.total_ip
-  }
-  subnet_id = aws_subnet.database.*.id
-
-  tags = {
-    "Name" = var.nat_gateway_tag
-  }
- # depends_on = [aws_internet_gateway.myIGW]
-}
-
-
-locals {
-  total_nat = [aws_nat_gateway.my_nat.id]
-}
-resource "aws_route" "private_nat_gateway" {
-  count = var.create_vpc && var.enable_nat_gateway ? var.nat_gateway_count : 0
-
-  route_table_id         = 
-  destination_cidr_block = "0.0.0.0/0"
-  dynamic "nat_attach_rt" {
-    for_each = local.total_nat
-    nat_gateway_id = local.total_nat
-  }
-
-  timeouts {
-    create = "5m"
-  }
-}
-
-resource "aws_route" "private_ipv6_egress" {
-  count = var.create_vpc && var.create_egress_only_igw && var.enable_ipv6 ? length(var.private_subnets) : 0
-
-  route_table_id              = element(aws_route_table.private.*.id, count.index)
-  destination_ipv6_cidr_block = "::/0"
-  egress_only_gateway_id      = element(aws_egress_only_internet_gateway.this.*.id, 0)
-}
 
 ################################################################################
 # Publiс routes
