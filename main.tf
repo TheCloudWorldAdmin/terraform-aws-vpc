@@ -385,11 +385,16 @@ data "aws_subnet_ids" "subnet_ids" {
   }
 }
 
-resource "aws_db_subnet_group" "database_subnet_group" {
+data "aws_subnet" "subnet" {
+  for_each = data.aws_subnet_ids.subnet_ids.ids
+  id       = each.value
+}
 
+resource "aws_db_subnet_group" "database_subnet_group" {
+  
+  subnet_ids  = [for s in data.aws_subnet.example : s.id]
   name        = var.db_subnet_group_name
   description = "Database subnet group for ${var.db_subnet_group_name}"
-  subnet_ids  = [data.aws_subnet_ids.subnet_ids.ids]
   tags = {
     "Name" = var.db_subnet_group_name
   }
