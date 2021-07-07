@@ -376,13 +376,20 @@ resource "aws_subnet" "database" {
 ################################################################################
 # Database subnet Group for RDS
 ################################################################################
+data "aws_subnet_ids" "subnet_ids" {
+  vpc_id = aws_vpc.myVPC.id
+  
+    filter {
+    name   = "tag:Name"
+    values = ["database_subnet_tag"] # insert values here
+  }
+}
 
 resource "aws_db_subnet_group" "database_subnet_group" {
 
   name        = var.db_subnet_group_name
   description = "Database subnet group for ${var.db_subnet_group_name}"
-  for_each = aws_subnet.database[count.index]
-    subnet_ids  = [aws_subnet.database[count.index]]
+  subnet_ids  = [aws_subnet_ids.subnet_ids.ids]
   tags = {
     "Name" = var.db_subnet_group_name
   }
