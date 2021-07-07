@@ -508,7 +508,7 @@ resource "aws_network_acl" "private" {
 resource "aws_network_acl_rule" "private_inbound" {
   count = var.create_vpc && var.private_dedicated_network_acl ? 1 : 0
 
-  network_acl_id = aws_network_acl.private.id
+  network_acl_id = aws_network_acl.private[count.index]
 
   egress          = false
   rule_number     = var.private_inbound_acl_rules[count.index]["rule_number"]
@@ -523,7 +523,7 @@ resource "aws_network_acl_rule" "private_inbound" {
 resource "aws_network_acl_rule" "private_outbound" {
   count = var.create_vpc && var.private_dedicated_network_acl ? 1 : 0
 
-  network_acl_id = aws_network_acl.private.id
+  network_acl_id = aws_network_acl.private[count.index]
 
   egress          = true
   rule_number     = var.private_outbound_acl_rules[count.index]["rule_number"]
