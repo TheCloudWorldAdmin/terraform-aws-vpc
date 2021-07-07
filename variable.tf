@@ -162,6 +162,16 @@ variable "database_subnets" {
   type = string
   default = "10.0.4.0/24"
 }
+variable "private_dedicated_network_acl" {
+  description = "Privated dedicated network acl is required? "
+  type = bool
+  default = true
+}
+variable "private_subnet_name" {
+  description = "Private subnet name tag"
+  type = string
+  default = "Private Subnet"
+}
 #variable "ipv6_cidr_block_private" {
 #  description = "IPv6 for database subnet"
 #  type = string
