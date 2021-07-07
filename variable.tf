@@ -79,6 +79,11 @@ variable "manage_default_route_table" {
   type = bool
   default = false
 }
+#variable "ingress_from_port" {
+#  description = "Ingresss port number for security group"
+#  type = number
+#  default = 80
+#}
 
 #variable "default_route_table_propagating_vgws" {
 #  description = "List of virtual gateways"
@@ -86,6 +91,11 @@ variable "manage_default_route_table" {
 #  default = ["",""]
 #}
 
+#variable "dhcp_options_domain_name" {
+ # description = "Mention the DHCP optoin domain name"
+#  type = string
+#  default = "my DHCP"
+#}
 variable "enable_nat_gateway" {
   description = "Whether to enable NAT Gateway"
   type = bool
