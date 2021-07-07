@@ -214,7 +214,7 @@ resource "aws_eip" "nat_eip" {
 }
 }
 locals {
-  total_ip = [aws_eip.nat_eip.id]
+  total_ip = [aws_eip.nat_eip[count.index].id]
   total_subnets = [aws_subnet.private.*.id, aws_subnet.database.*.id]
 }
 resource "aws_nat_gateway" "my_nat" {
@@ -252,11 +252,11 @@ resource "aws_route" "private_nat_gateway" {
 }
 
 resource "aws_route" "private_ipv6_egress" {
-  count = var.create_vpc && var.create_egress_only_igw && var.enable_ipv6 ? length(var.private_subnets) : 0
+  count = var.create_vpc && var.create_egress_only_igw ? 1 : 0
 
   route_table_id              = element(aws_route_table.private.*.id, count.index)
   destination_ipv6_cidr_block = "::/0"
-  egress_only_gateway_id      = element(aws_egress_only_internet_gateway.this.*.id, 0)
+  egress_only_gateway_id      = element(aws_egress_only_internet_gateway.my_egress_IGW.*.id, 0)
 }
 
 
@@ -274,11 +274,11 @@ resource "aws_route_table" "public_route_table" {
 }
 }
 resource "aws_route" "public_internet_gateway" {
-  count = var.create_vpc && var.create_igw && length(var.public_subnets) > 0 ? 1 : 0
+  count = var.create_vpc && var.create_igw ? 1 : 0
 
-  route_table_id         = aws_route_table.public_route_table.id
+  route_table_id         = aws_route_table.public_route_table[count.index]
   destination_cidr_block = "0.0.0.0/0"
-  gateway_id             = aws_internet_gateway.myIGW.id
+  gateway_id             = aws_internet_gateway.myIGW[count.index]
 
   timeouts {
     create = "10m"
@@ -286,11 +286,11 @@ resource "aws_route" "public_internet_gateway" {
 }
 
 resource "aws_route" "public_internet_gateway_ipv6" {
-  count = var.create_vpc && var.create_igw && var.enable_ipv6 && length(var.public_subnets) > 0 ? 1 : 0
+  count = var.create_vpc && var.create_igw ? 1 : 0
 
-  route_table_id              = aws_route_table.public_route_table.id
+  route_table_id              = aws_route_table.public_route_table[count.index]
   destination_ipv6_cidr_block = "::/0"
-  gateway_id                  = aws_internet_gateway.myIGW.id
+  gateway_id                  = aws_internet_gateway.myIGW[count.index]
 }
 
 ################################################################################
@@ -326,7 +326,7 @@ resource "aws_route" "database_internet_gateway" {
 
   route_table_id         = aws_route_table.database[0].id
   destination_cidr_block = "0.0.0.0/0"
-  gateway_id             = aws_internet_gateway.this[0].id
+  gateway_id             = aws_internet_gateway.myIGW[0].id
 
   timeouts {
     create = "5m"
@@ -338,7 +338,7 @@ resource "aws_route" "database_nat_gateway" {
   
   route_table_id         = element(aws_route_table.database.*.id, count.index)
   destination_cidr_block = "0.0.0.0/0"
-  nat_gateway_id         = element(aws_nat_gateway.this.*.id, count.index)
+  nat_gateway_id         = element(aws_nat_gateway.my_nat.*.id, count.index)
 
   timeouts {
     create = "5m"
@@ -350,7 +350,7 @@ resource "aws_route" "database_ipv6_egress" {
 
   route_table_id              = aws_route_table.database[0].id
   destination_ipv6_cidr_block = "::/0"
-  egress_only_gateway_id      = aws_egress_only_internet_gateway.this[0].id
+  egress_only_gateway_id      = aws_egress_only_internet_gateway.my_egress_IGW[0].id
 
   timeouts {
     create = "5m"
@@ -375,7 +375,7 @@ resource "aws_subnet" "public" {
   map_public_ip_on_launch         = var.map_public_ip_on_launch
   assign_ipv6_address_on_creation = var.public_subnet_assign_ipv6_address_on_creation
 
-  ipv6_cidr_block = var.ipv6_cidr_block_public[count.index]
+  #ipv6_cidr_block = var.ipv6_cidr_block_public[count.index]
 
   tags = {
     "Name" = var.public_subnet_tag
@@ -388,7 +388,7 @@ resource "aws_subnet" "public" {
 resource "aws_subnet" "private" {
   count = var.create_vpc && var.private_subnet_count ? 1 : 0
 
-  vpc_id                          = aws_vpc.myvpc.id
+  vpc_id                          = aws_vpc.myVPC.id
   cidr_block                      = var.private_subnets_cidr[count.index]
   availability_zone               = data.aws_availability_zones.available.names[count.index]
   assign_ipv6_address_on_creation = var.private_subnet_assign_ipv6_address_on_creation
@@ -412,7 +412,7 @@ resource "aws_subnet" "database" {
   availability_zone               = data.aws_availability_zones.available.names[count.index]
   assign_ipv6_address_on_creation = var.private_subnet_assign_ipv6_address_on_creation
 
-  ipv6_cidr_block = var.ipv6_cidr_block_private[count.index]
+  #ipv6_cidr_block = var.ipv6_cidr_block_private[count.index]
 
   tags = {
     "Name" = var.private_subnet_tag
@@ -443,7 +443,7 @@ resource "aws_db_subnet_group" "database_subnet_group" {
 resource "aws_default_network_acl" "my_default_network_acl" {
   count = var.create_vpc && var.manage_default_network_acl ? 1 : 0
 
-  default_network_acl_id = aws_vpc.mainvpc.default_network_acl_id
+  default_network_acl_id = aws_vpc.myVPC.default_network_acl_id
 }
 ################################################################################
 # Public Network ACLs
