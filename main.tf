@@ -377,62 +377,47 @@ resource "aws_route" "database_ipv6_egress" {
   }
 }
 
-
+################################################################################
+# Availability Zones list out
+################################################################################
+ data "aws_availability_zones" "available" {
+  state = "available"
+}
 ################################################################################
 # Public subnet
 ################################################################################
 
 resource "aws_subnet" "public" {
-  count = var.create_vpc ? length(var.public_subnets) : 0
-
-  vpc_id                          = local.vpc_id
-  cidr_block                      = element(concat(var.public_subnets, [""]), count.index)
-  availability_zone               = length(regexall("^[a-z]{2}-", element(var.azs, count.index))) > 0 ? element(var.azs, count.index) : null
-  availability_zone_id            = length(regexall("^[a-z]{2}-", element(var.azs, count.index))) == 0 ? element(var.azs, count.index) : null
+  count = var.create_vpc ? var.public_subnet_count : 0
+  vpc_id                          = aws_vpc.myVPC.id
+  cidr_block                      = var.public_subnets_cidr[count.index]
+  availability_zone               = data.aws_availability_zones.available.names[count.index]
   map_public_ip_on_launch         = var.map_public_ip_on_launch
-  assign_ipv6_address_on_creation = var.public_subnet_assign_ipv6_address_on_creation == null ? var.assign_ipv6_address_on_creation : var.public_subnet_assign_ipv6_address_on_creation
+  assign_ipv6_address_on_creation = var.public_subnet_assign_ipv6_address_on_creation
 
-  ipv6_cidr_block = var.enable_ipv6 && length(var.public_subnet_ipv6_prefixes) > 0 ? cidrsubnet(aws_vpc.this[0].ipv6_cidr_block, 8, var.public_subnet_ipv6_prefixes[count.index]) : null
+  ipv6_cidr_block = var.ipv6_cidr_block_public[count.index]
 
-  tags = merge(
-    {
-      "Name" = format(
-        "%s-${var.public_subnet_suffix}-%s",
-        var.name,
-        element(var.azs, count.index),
-      )
-    },
-    var.tags,
-    var.public_subnet_tags,
-  )
+  tags = {
+    "Name" = var.public_subnet_tag
 }
-
+}
 ################################################################################
 # Private subnet
 ################################################################################
 
 resource "aws_subnet" "private" {
-  count = var.create_vpc && length(var.private_subnets) > 0 ? length(var.private_subnets) : 0
+  count = var.create_vpc && var.private_subnet_count : 0
 
-  vpc_id                          = local.vpc_id
-  cidr_block                      = var.private_subnets[count.index]
-  availability_zone               = length(regexall("^[a-z]{2}-", element(var.azs, count.index))) > 0 ? element(var.azs, count.index) : null
-  availability_zone_id            = length(regexall("^[a-z]{2}-", element(var.azs, count.index))) == 0 ? element(var.azs, count.index) : null
-  assign_ipv6_address_on_creation = var.private_subnet_assign_ipv6_address_on_creation == null ? var.assign_ipv6_address_on_creation : var.private_subnet_assign_ipv6_address_on_creation
+  vpc_id                          = aws_vpc.myvpc.id
+  cidr_block                      = var.private_subnets_cidr[count.index]
+  availability_zone               = data.aws_availability_zones.available.names[count.index]
+  assign_ipv6_address_on_creation = var.private_subnet_assign_ipv6_address_on_creation
 
-  ipv6_cidr_block = var.enable_ipv6 && length(var.private_subnet_ipv6_prefixes) > 0 ? cidrsubnet(aws_vpc.this[0].ipv6_cidr_block, 8, var.private_subnet_ipv6_prefixes[count.index]) : null
+  ipv6_cidr_block = var.ipv6_cidr_block_private[count.index]
 
-  tags = merge(
-    {
-      "Name" = format(
-        "%s-${var.private_subnet_suffix}-%s",
-        var.name,
-        element(var.azs, count.index),
-      )
-    },
-    var.tags,
-    var.private_subnet_tags,
-  )
+  tags = {
+    "Name" = var.private_subnet_tag
+}
 }
 
 ################################################################################
@@ -440,34 +425,29 @@ resource "aws_subnet" "private" {
 ################################################################################
 
 resource "aws_subnet" "database" {
-  count = var.create_vpc && length(var.database_subnets) > 0 ? length(var.database_subnets) : 0
+  count = var.create_vpc ? var.database_subnets_count : 0
 
-  vpc_id                          = local.vpc_id
+  vpc_id                          = aws_vpc.myVPC.id
   cidr_block                      = var.database_subnets[count.index]
-  availability_zone               = length(regexall("^[a-z]{2}-", element(var.azs, count.index))) > 0 ? element(var.azs, count.index) : null
-  availability_zone_id            = length(regexall("^[a-z]{2}-", element(var.azs, count.index))) == 0 ? element(var.azs, count.index) : null
-  assign_ipv6_address_on_creation = var.database_subnet_assign_ipv6_address_on_creation == null ? var.assign_ipv6_address_on_creation : var.database_subnet_assign_ipv6_address_on_creation
+  availability_zone               = data.aws_availability_zones.available.names[count.index]
+  assign_ipv6_address_on_creation = var.private_subnet_assign_ipv6_address_on_creation
 
-  ipv6_cidr_block = var.enable_ipv6 && length(var.database_subnet_ipv6_prefixes) > 0 ? cidrsubnet(aws_vpc.this[0].ipv6_cidr_block, 8, var.database_subnet_ipv6_prefixes[count.index]) : null
+  ipv6_cidr_block = var.ipv6_cidr_block_private[count.index]
 
-  tags = merge(
-    {
-      "Name" = format(
-        "%s-${var.database_subnet_suffix}-%s",
-        var.name,
-        element(var.azs, count.index),
-      )
-    },
-    var.tags,
-    var.database_subnet_tags,
-  )
+  tags = {
+    "Name" = var.private_subnet_tag
 }
+}
+  
+################################################################################
+# Database subnet Group for RDS
+################################################################################
 
-resource "aws_db_subnet_group" "database" {
-  count = var.create_vpc && length(var.database_subnets) > 0 && var.create_database_subnet_group ? 1 : 0
+resource "aws_db_subnet_group" "database_subnet_group" {
+  count = var.database_subnets_count > 0 ? 1 : 0
 
-  name        = lower(coalesce(var.database_subnet_group_name, var.name))
-  description = "Database subnet group for ${var.name}"
+  name        = var.db_subnet_group_name
+  description = "Database subnet group for ${var.db_subnet_group_name}"
   subnet_ids  = aws_subnet.database.*.id
 
   tags = merge(
