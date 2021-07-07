@@ -393,7 +393,7 @@ resource "aws_subnet" "private" {
   availability_zone               = data.aws_availability_zones.available.names[count.index]
   assign_ipv6_address_on_creation = var.private_subnet_assign_ipv6_address_on_creation
 
-  ipv6_cidr_block = var.ipv6_cidr_block_private[count.index]
+ # ipv6_cidr_block = var.ipv6_cidr_block_private[count.index]
 
   tags = {
     "Name" = var.private_subnet_tag
@@ -415,7 +415,7 @@ resource "aws_subnet" "database" {
   #ipv6_cidr_block = var.ipv6_cidr_block_private[count.index]
 
   tags = {
-    "Name" = var.private_subnet_tag
+    "Name" = var.database_subnet_tag
 }
 }
   
@@ -464,7 +464,7 @@ resource "aws_network_acl" "public_network_acl" {
 resource "aws_network_acl_rule" "public_inbound" {
   count = var.create_vpc && var.public_dedicated_network_acl ? 1 : 0
 
-  network_acl_id = aws_network_acl.public_network_acl.id
+  network_acl_id = aws_network_acl.public_network_acl[count.index]
 
   egress          = false
   rule_number     = var.public_inbound_acl_rules[count.index]["rule_number"]
@@ -479,7 +479,7 @@ resource "aws_network_acl_rule" "public_inbound" {
 resource "aws_network_acl_rule" "public_outbound" {
   count = var.create_vpc && var.public_dedicated_network_acl ? 1 : 0
 
-  network_acl_id = aws_network_acl.public_network_acl.id
+  network_acl_id = aws_network_acl.public_network_acl[count.index]
 
   egress          = true
   rule_number     = var.public_outbound_acl_rules[count.index]["rule_number"]
@@ -613,7 +613,7 @@ resource "aws_route_table_association" "public" {
   count = var.create_vpc && var.public_route_table_association_required ? 1: 0
   
   subnet_id      = element(aws_subnet.public.*.id, count.index)
-  route_table_id = aws_route_table.public_route_table.id
+  route_table_id = aws_route_table.public_route_table[count.index]
 }
 
 ################################################################################
