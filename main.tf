@@ -100,26 +100,26 @@ resource "aws_vpc_ipv4_cidr_block_association" "vpc_ipv4_cidr_association" {
 # DHCP Options Set
 ################################################################################
 
-resource "aws_vpc_dhcp_options" "dhcp_options" {
-  count = var.create_vpc && var.enable_dhcp_options ? 1 : 0
+#resource "aws_vpc_dhcp_options" "dhcp_options" {
+#  count = var.create_vpc && var.enable_dhcp_options ? 1 : 0
 
-  domain_name          = var.dhcp_options_domain_name
-  domain_name_servers  = var.dhcp_options_domain_name_servers
-  ntp_servers          = var.dhcp_options_ntp_servers
-  netbios_name_servers = var.dhcp_options_netbios_name_servers
-  netbios_node_type    = var.dhcp_options_netbios_node_type
+#  domain_name          = var.dhcp_options_domain_name
+#  domain_name_servers  = var.dhcp_options_domain_name_servers
+#  ntp_servers          = var.dhcp_options_ntp_servers
+#  netbios_name_servers = var.dhcp_options_netbios_name_servers
+#  netbios_node_type    = var.dhcp_options_netbios_node_type
 
-  tags = {
-    "Name" = var.dhcp_options_tag
-}
-}
+  #tags = {
+  #  "Name" = var.dhcp_options_tag
+#}
+#}
 
-resource "aws_vpc_dhcp_options_association" "dhcp_options_association" {
-  count = var.create_vpc && var.enable_dhcp_options ? 1 : 0
+#resource "aws_vpc_dhcp_options_association" "dhcp_options_association" {
+#  count = var.create_vpc && var.enable_dhcp_options ? 1 : 0
 
-  vpc_id          = aws_vpc.myVPC.id
-  dhcp_options_id = aws_vpc_dhcp_options.dhcp_options.id
-}
+  #vpc_id          = aws_vpc.myVPC.id
+  #dhcp_options_id = aws_vpc_dhcp_options.dhcp_options.id
+#}
 
 ################################################################################
 # Internet Gateway
