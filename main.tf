@@ -214,7 +214,7 @@ resource "aws_eip" "nat_eip" {
 }
 }
 locals {
-  total_ip = aws_eip.nat_eip[count.index]
+  total_ip = aws_eip.nat_eip.id
   total_subnets = [aws_subnet.private.*.id, aws_subnet.database.*.id]
 }
 resource "aws_nat_gateway" "my_nat" {
@@ -222,8 +222,8 @@ resource "aws_nat_gateway" "my_nat" {
 
   dynamic "eip_attach_nat" {
     for_each = local.total_ip
-    association_id = local.total_ip[count.index]
-    subnet_id = local.total_subnets[count.index]
+      association_id = local.total_ip[count.index]
+      subnet_id = local.total_subnets[count.index]
   }
 
   tags = {
@@ -243,7 +243,7 @@ resource "aws_route" "private_nat_gateway" {
   destination_cidr_block = "0.0.0.0/0"
   dynamic "nat_attach_rt" {
     for_each = local.total_nat
-    nat_gateway_id = local.total_nat[count.index]
+      nat_gateway_id = local.total_nat[count.index]
   }
 
   timeouts {
