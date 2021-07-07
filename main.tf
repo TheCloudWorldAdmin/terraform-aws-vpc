@@ -281,7 +281,7 @@ resource "aws_route" "database_internet_gateway" {
 
   route_table_id         = aws_route_table.database[0].id
   destination_cidr_block = "0.0.0.0/0"
-  gateway_id             = aws_internet_gateway.myIGW[0].id
+  gateway_id             = aws_internet_gateway.myIGW.id
 
   timeouts {
     create = "5m"
