@@ -204,8 +204,7 @@ resource "aws_eip" "nat_eip" {
 }
 resource "aws_nat_gateway" "my_nat" {
   allocation_id = aws_eip.nat_eip.id
-  subnet_id     = aws_subnet.database[0].id
-
+  subnet_id     = aws_subnet.database[count.index]
   tags = {
     Name = "gw NAT"
   }
@@ -362,7 +361,7 @@ resource "aws_subnet" "private" {
 ################################################################################
 
 resource "aws_subnet" "database" {
-  count = var.create_vpc ? var.database_subnets_count : 0
+  count = var.create_vpc ? 2 : 0
 
   vpc_id                          = aws_vpc.myVPC.id
   cidr_block                      = var.database_subnets
