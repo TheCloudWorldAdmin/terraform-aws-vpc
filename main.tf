@@ -567,7 +567,7 @@ resource "aws_network_acl" "database" {
   tags = {
     "Name" = var.nacl_database_tag
 }
-
+}
 resource "aws_network_acl_rule" "database_inbound" {
   count = var.create_vpc && var.database_dedicated_network_acl ? 1 : 0
 
