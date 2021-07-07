@@ -4,7 +4,11 @@ variable "create_vpc" {
   default = false
 }
 
-variable "cidr" {}
+variable "cidr" {
+  description = "Enter the CIDR range required for VPC"
+  type = string
+  default = "10.0.0.0/16"
+}
 variable "instance_tenancy" {
   description = "Instance will be shared, dedicated and host. 'default' is shared"
   type = string
@@ -53,8 +57,16 @@ variable "another_cidr" {
   default = false
 }
 
-variable "secondary_cidr" {}
-variable "default_security_group_name" {}
+variable "secondary_cidr" {
+  description = "Enter the CIDR range for secondary CIDR Block"
+  type = string
+  default = "192.168.0.0/16"
+}
+variable "default_security_group_name" {
+  description = "Enter the name for security group"
+  type = string
+  default = "my_default_security_group"
+}
 
 variable "enable_dhcp_options" {
   description = "Enable DHCP options.. True or False"
@@ -68,11 +80,11 @@ variable "manage_default_route_table" {
   string = false
 }
 
-variable "default_route_table_propagating_vgws" {
-  description = "List of virtual gateways"
-  type = list(string)
-  default = ["",""]
-}
+#variable "default_route_table_propagating_vgws" {
+#  description = "List of virtual gateways"
+#  type = list(string)
+#  default = ["",""]
+#}
 
 variable "enable_nat_gateway" {
   description = "Whether to enable NAT Gateway"
@@ -106,7 +118,7 @@ variable "public_subnet_count" {
 variable "public_subnets_cidr" {
   description = "Cidr Blocks"
   type = list(string)
-  default = {""}
+  default = {"10.0.1.0/24", "10.0.2.0/24"}
 }
 
 variable "map_public_ip_on_launch" {
@@ -133,11 +145,11 @@ variabl "private_subnet_assign_ipv6_address_on_creation" {
   default = false
 }
 
-variable "ipv6_cidr_block_private" {
-  description = "IPv6 cidr block to be used"
-  type = list(string)
-  default = {""}
-}
+#ariable "ipv6_cidr_block_private" {
+# description = "IPv6 cidr block to be used"
+# type = list(string)
+# default = {""}
+#
 variable "database_subnets_count" {
   description "Enter the number of subnets required for DB"
   type = number
