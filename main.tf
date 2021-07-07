@@ -360,10 +360,10 @@ resource "aws_subnet" "private" {
 ################################################################################
 
 resource "aws_subnet" "database" {
-
+count = 2
   vpc_id                          = aws_vpc.myVPC.id
   cidr_block                      = var.database_subnets
-  availability_zone               = data.aws_availability_zones.available.names[0]
+  availability_zone               = data.aws_availability_zones.available.names[count.index]
   assign_ipv6_address_on_creation = var.private_subnet_assign_ipv6_address_on_creation
 
   #ipv6_cidr_block = var.ipv6_cidr_block_private[count.index]
