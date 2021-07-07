@@ -126,7 +126,6 @@ resource "aws_vpc_ipv4_cidr_block_association" "vpc_ipv4_cidr_association" {
 ################################################################################
 
 resource "aws_internet_gateway" "myIGW" {
-  count = var.create_vpc && var.create_igw ? 1 : 0
 
   vpc_id = aws_vpc.myVPC.id
 
@@ -383,7 +382,6 @@ resource "aws_db_subnet_group" "database_subnet_group" {
   name        = var.db_subnet_group_name
   description = "Database subnet group for ${var.db_subnet_group_name}"
   subnet_ids  = [aws_subnet.database.id]
-
   tags = {
     "Name" = var.db_subnet_group_name
   }
