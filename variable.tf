@@ -97,4 +97,56 @@ variable "public_subnet" {
   default = 1
 }
 
+variable "public_subnet_count" {
+  description = "Enter the number public subnets you want"
+  type = number
+  default = 1
+}
+
+variable "public_subnets_cidr" {
+  description = "Cidr Blocks"
+  type = list(string)
+  default = {""}
+}
+
+variable "map_public_ip_on_launch" {
+  description = "It will map the public ip while launching resources"
+  type = bool
+  default = true
+}
+
+variabl "public_subnet_assign_ipv6_address_on_creation" {
+  description = "IPv6 address to be assinged to resources"
+  type = bool
+  default = false
+}
+
+variable "ipv6_cidr_block_public" {
+  description = "IPv6 cidr block to be used"
+  type = list(string)
+  default = {""}
+}
+
+variabl "private_subnet_assign_ipv6_address_on_creation" {
+  description = "IPv6 address to be assinged to resources"
+  type = bool
+  default = false
+}
+
+variable "ipv6_cidr_block_private" {
+  description = "IPv6 cidr block to be used"
+  type = list(string)
+  default = {""}
+}
+variable "database_subnets_count" {
+  description "Enter the number of subnets required for DB"
+  type = number
+  default = 2
+}
+
+variable "db_subnet_group_name" {
+  description = "Name of the subnet group created"
+  type = string
+  default = "my_subnet_group"
+}
 
