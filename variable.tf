@@ -74,4 +74,27 @@ variable "default_route_table_propagating_vgws" {
   default = ["",""]
 }
 
-variable "
+variable "enable_nat_gateway" {
+  description = "Whether to enable NAT Gateway"
+  type = bool
+  default = true
+}
+
+variable "nat_gateway_count" {
+  description = "Number of NAT Gateway"
+  type = number
+  default = 1
+}
+
+variable "nat_gateway_tag" {
+  description = "Enter the Tag name of NAT Gateway"
+  type = string
+  default = "my_natgateway"
+}
+variable "public_subnet" {
+  description = "enter the number of public subnets you need"
+  type = number
+  default = 1
+}
+
+
