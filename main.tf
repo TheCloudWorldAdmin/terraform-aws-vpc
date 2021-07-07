@@ -404,7 +404,7 @@ resource "aws_subnet" "public" {
 ################################################################################
 
 resource "aws_subnet" "private" {
-  count = var.create_vpc && var.private_subnet_count : 0
+  count = var.create_vpc && var.private_subnet_count ? 1 : 0
 
   vpc_id                          = aws_vpc.myvpc.id
   cidr_block                      = var.private_subnets_cidr[count.index]
