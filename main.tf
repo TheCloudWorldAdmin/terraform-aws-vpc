@@ -381,7 +381,7 @@ data "aws_subnet_ids" "subnet_ids" {
   
     filter {
     name   = "tag:Name"
-    values = ["database_subnet_tag"] # insert values here
+    values = [var.database_subnet_tag] # insert values here
   }
 }
 
