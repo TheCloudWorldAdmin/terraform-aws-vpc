@@ -553,7 +553,7 @@ resource "aws_network_acl" "database" {
 resource "aws_network_acl_rule" "database_inbound" {
   count = var.create_vpc && var.database_dedicated_network_acl ? 1 : 0
 
-  network_acl_id = aws_network_acl.database.id
+  network_acl_id = aws_network_acl.database[count.index]
 
   egress          = false
   rule_number     = var.database_inbound_acl_rules[count.index]["rule_number"]
@@ -568,7 +568,7 @@ resource "aws_network_acl_rule" "database_inbound" {
 resource "aws_network_acl_rule" "database_outbound" {
   count = var.create_vpc && var.database_dedicated_network_acl ? 1 : 0
 
-  network_acl_id = aws_network_acl.database.id
+  network_acl_id = aws_network_acl.database[count.index]
 
   egress          = true
   rule_number     = var.database_outbound_acl_rules[count.index]["rule_number"]
