@@ -149,14 +149,7 @@ resource "aws_egress_only_internet_gateway" "my_egress_IGW" {
 ################################################################################
 # Default route
 ################################################################################
-
-resource "aws_default_route_table" "default_route_table" {
-  count = var.create_vpc && var.manage_default_route_table ? 1 : 0
-
-  default_route_table_id = aws_vpc.myVPC.default_route_table_id
-  propagating_vgws       = var.default_route_table_propagating_vgws
-  
-  locals {
+ locals {
   default_route_table_routes = [{
     cidr_block = var.cidr_block_default_route_table
     ipv6_cidr_block = var.ipv6_cidr_block_route
@@ -170,6 +163,11 @@ resource "aws_default_route_table" "default_route_table" {
     vpc_peering_connection_id = var.vpc_peering_connection_id_route
   }]
   }  
+resource "aws_default_route_table" "default_route_table" {
+  count = var.create_vpc && var.manage_default_route_table ? 1 : 0
+
+  default_route_table_id = aws_vpc.myVPC.default_route_table_id
+  #propagating_vgws       = var.default_route_table_propagating_vgws
 
   dynamic "route" {
     for_each = var.default_route_table_routes
