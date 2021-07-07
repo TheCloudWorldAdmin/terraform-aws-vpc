@@ -211,7 +211,7 @@ resource "aws_nat_gateway" "my_nat" {
 
   # To ensure proper ordering, it is recommended to add an explicit dependency
   # on the Internet Gateway for the VPC.
-  depends_on = [aws_internet_gateway.myIGW]
+  #depends_on = [aws_internet_gateway.myIGW]
 }
 
 
@@ -379,11 +379,10 @@ resource "aws_subnet" "database" {
 ################################################################################
 
 resource "aws_db_subnet_group" "database_subnet_group" {
-  count = var.database_subnets_count > 0 ? 1 : 0
 
   name        = var.db_subnet_group_name
   description = "Database subnet group for ${var.db_subnet_group_name}"
-  subnet_ids  = aws_subnet.database.*.id
+  subnet_ids  = aws_subnet.database.id
 
   tags = {
     "Name" = var.db_subnet_group_name
