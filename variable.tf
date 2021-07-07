@@ -3,6 +3,21 @@ variable "create_vpc" {
   type = bool
   default = false
 }
+variable "database_dedicated_network_acl" {
+  description = "Whether database dedicated network acl required"
+  type = bool
+  default = false
+}
+variable "database_route_table_association_required" {
+  description = "Whether db route table association required"
+  type = bool
+  default = true
+}
+variable "nacl_database_tag" {
+  description = "Tag for database NACL"
+  type = string
+  default = "db_nacl_tag"
+}
 variable "create_igw" {
   description = "Whether IGW needs to be created"
   type = bool
