@@ -205,8 +205,6 @@ resource "aws_egress_only_internet_gateway" "my_egress_IGW" {
 #
 # but then when count of aws_eip.nat.*.id is zero, this would throw a resource not found error on aws_eip.nat.*.id.
 resource "aws_eip" "nat_eip" {
-  count = var.nat_gateway_count
-
   vpc = true
 
   tags = {
@@ -214,15 +212,13 @@ resource "aws_eip" "nat_eip" {
 }
 }
 locals {
-  total_ip = aws_eip.nat_eip.id
   total_subnets = [aws_subnet.private.*.id, aws_subnet.database.*.id]
 }
 resource "aws_nat_gateway" "my_nat" {
   count = var.create_vpc && var.enable_nat_gateway ? var.nat_gateway_count : 0
-
+  association_id = aws_eip.nat_eip.id
   dynamic "eip_attach_nat" {
-    for_each = local.total_ip
-      association_id = local.total_ip[count.index]
+    for_each = local.total_subnets
       subnet_id = local.total_subnets[count.index]
   }
 
