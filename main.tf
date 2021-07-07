@@ -462,8 +462,7 @@ resource "aws_default_network_acl" "my_default_network_acl" {
   count = var.create_vpc && var.manage_default_network_acl ? 1 : 0
 
   default_network_acl_id = aws_vpc.mainvpc.default_network_acl_id
-
-  
+}
 ################################################################################
 # Public Network ACLs
 ################################################################################
