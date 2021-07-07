@@ -31,7 +31,7 @@ resource "aws_vpc_ipv4_cidr_block_association" "vpc_ipv4_cidr_association" {
 #################################################################################
 # Default security group
 ################################################################################
-
+<!---
 locals {
   default_security_group_ingress = {
     description = "Ingress default security group"
@@ -42,6 +42,7 @@ locals {
     prefix_list_ids = var.ingress_prefix_list_ids
     security_groups = var.ingress_security_groups
 }
+  
 }
 locals {
   default_security_group_egress = {  
@@ -94,7 +95,7 @@ resource "aws_default_security_group" "this" {
     "Name" = var.default_security_group_name
 }
 }
-
+--->
 ################################################################################
 # DHCP Options Set
 ################################################################################
