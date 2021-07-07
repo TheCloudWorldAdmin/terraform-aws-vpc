@@ -3,7 +3,41 @@ variable "create_vpc" {
   type = bool
   default = false
 }
-
+variable "create_igw" {
+  description = "Whether IGW needs to be created"
+  type = bool
+  default = true
+}
+variable "igw_tag" {
+  description = "Mention Tag needs to be associated with internet gateway"
+  type = string
+  default = "my_igw"
+}
+variable "create_egress_only_igw" {
+  description = "Whether egress only igw needs to be created"
+  type = bool
+  default = false
+}
+variable "egress_igw_tag" {
+  description = "Tag name for Egress IGW"
+  type = string
+  default = "Egress_IGW_Tag"
+}
+variable "public_route_table_tag" {
+  description = "Tag name for public route table"
+  type = string
+  default = "Public route table"
+}
+variable "private_route_table_tag" {
+  description = "Tag for private route table"
+  type = string
+  default = "private_route_table_tag"
+}
+variable "database_route_table_tag" {
+  description = "Tage for database route table"
+  type = string
+  default = "DB_route_table_tag"
+}
 variable "cidr" {
   description = "Enter the CIDR range required for VPC"
   type = string
