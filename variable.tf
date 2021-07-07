@@ -264,3 +264,13 @@ variable "database_outbound_acl_rules" {
   ]
 }
 
+variable "private_route_table_association_required" {
+  description = "Whether private route table association is required"
+  type = bool
+  default = true
+}
+variable "manage_default_vpc" {
+  description = "Whether default VPC is required"
+  type = bool
+  default = false
+}
