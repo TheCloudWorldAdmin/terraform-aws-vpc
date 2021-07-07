@@ -470,25 +470,21 @@ resource "aws_default_network_acl" "my_default_network_acl" {
 # Public Network ACLs
 ################################################################################
 
-resource "aws_network_acl" "public" {
-  count = var.create_vpc && var.public_dedicated_network_acl && length(var.public_subnets) > 0 ? 1 : 0
+resource "aws_network_acl" "public_network_acl" {
+  count = var.create_vpc && var.public_dedicated_network_acl ? 1 : 0
 
-  vpc_id     = element(concat(aws_vpc.this.*.id, [""]), 0)
+  vpc_id     = aws_vpc.myVPC.id
   subnet_ids = aws_subnet.public.*.id
 
-  tags = merge(
-    {
-      "Name" = format("%s-${var.public_subnet_suffix}", var.name)
-    },
-    var.tags,
-    var.public_acl_tags,
-  )
+  tags = {
+    "Name" = var.public_network_acl_tag
+}
 }
 
 resource "aws_network_acl_rule" "public_inbound" {
-  count = var.create_vpc && var.public_dedicated_network_acl && length(var.public_subnets) > 0 ? length(var.public_inbound_acl_rules) : 0
+  count = var.create_vpc && var.public_dedicated_network_acl ? 1 : 0
 
-  network_acl_id = aws_network_acl.public[0].id
+  network_acl_id = aws_network_acl.public_network_acl.id
 
   egress          = false
   rule_number     = var.public_inbound_acl_rules[count.index]["rule_number"]
