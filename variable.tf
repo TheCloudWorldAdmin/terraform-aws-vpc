@@ -16,31 +16,31 @@ variable "instance_tenancy" {
 }
 
 variable "enable_dns_hostnames" {
-  desctiption = "Enable DNS Hostname"
+  description = "Enable DNS Hostname"
   type = bool
-  defualt = false
+  default = false
 }
 
 variable "enable_dns_support" {
-  desctiption = "Enable DNS Support"
+  description = "Enable DNS Support"
   type = bool
-  defualt = false
+  default = false
 }
 
 variable "enable_classiclink" {
-  desctiption = "A boolean flag to enable/disable ClassicLink for the VPC. Only valid in regions and accounts that support EC2 Classic."
+  description = "A boolean flag to enable/disable ClassicLink for the VPC. Only valid in regions and accounts that support EC2 Classic."
   type = bool
-  defualt = false
+  default = false
 }
 
 variable "enable_classiclink_dns_support" {
-  desctiption = "A boolean flag to enable/disable ClassicLink DNS Support for the VPC. Only valid in regions and accounts that support EC2 Classic."
+  description = "A boolean flag to enable/disable ClassicLink DNS Support for the VPC. Only valid in regions and accounts that support EC2 Classic."
   type = bool
-  defualt = false
+  default = false
 }
 
 variable "enable_ipv6" {
-  desctiption = "Requests an Amazon-provided IPv6 CIDR block with a /56 prefix length for the VPC. You cannot specify the range of IP addresses, or the size of the CIDR block."
+  description = "Requests an Amazon-provided IPv6 CIDR block with a /56 prefix length for the VPC. You cannot specify the range of IP addresses, or the size of the CIDR block."
   type = bool
   default = false
 }
@@ -77,7 +77,7 @@ variable "enable_dhcp_options" {
 variable "manage_default_route_table" {
   description = "Are we managing default route table"
   type = bool
-  string = false
+  default = false
 }
 
 #variable "default_route_table_propagating_vgws" {
@@ -118,7 +118,7 @@ variable "public_subnet_count" {
 variable "public_subnets_cidr" {
   description = "Cidr Blocks"
   type = list(string)
-  default = {"10.0.1.0/24", "10.0.2.0/24"}
+  default = ["10.0.1.0/24", "10.0.2.0/24"]
 }
 
 variable "map_public_ip_on_launch" {
@@ -127,19 +127,19 @@ variable "map_public_ip_on_launch" {
   default = true
 }
 
-variabl "public_subnet_assign_ipv6_address_on_creation" {
+variable "public_subnet_assign_ipv6_address_on_creation" {
   description = "IPv6 address to be assinged to resources"
   type = bool
   default = false
 }
 
-variable "ipv6_cidr_block_public" {
-  description = "IPv6 cidr block to be used"
-  type = list(string)
-  default = {""}
-}
+#variable "ipv6_cidr_block_public" {
+#  description = "IPv6 cidr block to be used"
+#  type = list(string)
+#  default = {""}
+#}
 
-variabl "private_subnet_assign_ipv6_address_on_creation" {
+variable "private_subnet_assign_ipv6_address_on_creation" {
   description = "IPv6 address to be assinged to resources"
   type = bool
   default = false
@@ -151,7 +151,7 @@ variabl "private_subnet_assign_ipv6_address_on_creation" {
 # default = {""}
 #
 variable "database_subnets_count" {
-  description "Enter the number of subnets required for DB"
+  description = "Enter the number of subnets required for DB"
   type = number
   default = 2
 }
