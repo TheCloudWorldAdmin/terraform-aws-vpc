@@ -195,6 +195,13 @@ resource "aws_egress_only_internet_gateway" "my_egress_IGW" {
 ##################################################################################
 # NAT Gateway Private
 ################################################################################
+resource "aws_eip" "nat_eip" {
+  vpc = true
+
+  tags = {
+    "Name" = var.nat_gateway_tag
+}
+}
 resource "aws_nat_gateway" "my_nat" {
   allocation_id = aws_eip.my_eip.id
   subnet_id     = aws_subnet.database.*.id
