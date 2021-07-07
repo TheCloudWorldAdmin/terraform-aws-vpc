@@ -147,6 +147,31 @@ variable "nat_gateway_tag" {
   type = string
   default = "my_natgateway"
 }
+variable "public_subnet_tag" {
+  description = "Tag for public subnet"
+  type = string
+  default = "public_subnet_tag"
+}
+variable "private_subnet_count" {
+  description = "Count of private subnet"
+  type = number
+  default = 1
+}
+variable "database_subnets" {
+  description = "CIDR block for database subnet"
+  type = string
+  default = "10.0.4.0/24"
+}
+#variable "ipv6_cidr_block_private" {
+#  description = "IPv6 for database subnet"
+#  type = string
+#  default = ""
+#}
+#variable "ipv6_cidr_block_public" {
+#  description = "IPv6 CIDR Block for public subnet"
+#  type = string
+#  default = ""
+#}
 variable "public_subnet" {
   description = "enter the number of public subnets you need"
   type = number
@@ -329,4 +354,24 @@ variable "manage_default_vpc" {
   description = "Whether default VPC is required"
   type = bool
   default = false
+}
+variable "default_vpc_enable_dns_support" {
+  description = "Whether dns support needs to be enabled"
+  type = bool
+  default = true
+}
+variable "default_vpc_enable_dns_hostnames" {
+  description = "Whether dns hostname needs to be enabled"
+  type = bool
+  default = true
+}
+variable "default_vpc_enable_classiclink" {
+  description = "Whether classiclink needs to be enabled"
+  type = bool
+  default = true
+}
+variable "default_vpc_tag" {
+  description = "Tag for default VPC"
+  type = string
+  default = "Default VPC Tag"
 }
