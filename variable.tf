@@ -154,8 +154,8 @@ variable "public_subnet_tag" {
 }
 variable "private_subnet_count" {
   description = "Count of private subnet"
-  type = number
-  default = 1
+  type = bool
+  default = true
 }
 variable "database_subnets" {
   description = "CIDR block for database subnet"
@@ -189,7 +189,21 @@ variable "public_subnets_cidr" {
   type = list(string)
   default = ["10.0.1.0/24", "10.0.2.0/24"]
 }
-
+variable "private_subnets_cidr" {
+  description = "Cidr Blocks"
+  type = list(string)
+  default = ["10.0.10.0/24", "10.0.11.0/24"]
+}
+variable "private_subnet_tag" {
+  description = "Tag for Private Subnet"
+  type = string
+  default = "private_subnet_tag"
+}
+variable "database_subnet_tag" {
+  description = "Tag for Private Subnet"
+  type = string
+  default = "database_subnet_tag"
+}
 variable "map_public_ip_on_launch" {
   description = "It will map the public ip while launching resources"
   type = bool
@@ -375,3 +389,10 @@ variable "default_vpc_tag" {
   type = string
   default = "Default VPC Tag"
 }
+
+variable "public_route_table_association_required" {
+  description = "Whether public route table association required"
+  type = bool
+  default = true
+}
+
