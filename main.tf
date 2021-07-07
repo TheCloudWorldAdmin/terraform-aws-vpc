@@ -450,114 +450,22 @@ resource "aws_db_subnet_group" "database_subnet_group" {
   description = "Database subnet group for ${var.db_subnet_group_name}"
   subnet_ids  = aws_subnet.database.*.id
 
-  tags = merge(
-    {
-      "Name" = format("%s", lower(coalesce(var.database_subnet_group_name, var.name)))
-    },
-    var.tags,
-    var.database_subnet_group_tags,
-  )
+  tags = {
+    "Name" = var.db_subnet_group_name
+  }
 }
 
-
-################################################################################
-# Intra subnets - private subnet without NAT gateway
-################################################################################
-
-resource "aws_subnet" "intra" {
-  count = var.create_vpc && length(var.intra_subnets) > 0 ? length(var.intra_subnets) : 0
-
-  vpc_id                          = local.vpc_id
-  cidr_block                      = var.intra_subnets[count.index]
-  availability_zone               = length(regexall("^[a-z]{2}-", element(var.azs, count.index))) > 0 ? element(var.azs, count.index) : null
-  availability_zone_id            = length(regexall("^[a-z]{2}-", element(var.azs, count.index))) == 0 ? element(var.azs, count.index) : null
-  assign_ipv6_address_on_creation = var.intra_subnet_assign_ipv6_address_on_creation == null ? var.assign_ipv6_address_on_creation : var.intra_subnet_assign_ipv6_address_on_creation
-
-  ipv6_cidr_block = var.enable_ipv6 && length(var.intra_subnet_ipv6_prefixes) > 0 ? cidrsubnet(aws_vpc.this[0].ipv6_cidr_block, 8, var.intra_subnet_ipv6_prefixes[count.index]) : null
-
-  tags = merge(
-    {
-      "Name" = format(
-        "%s-${var.intra_subnet_suffix}-%s",
-        var.name,
-        element(var.azs, count.index),
-      )
-    },
-    var.tags,
-    var.intra_subnet_tags,
-  )
-}
 
 ################################################################################
 # Default Network ACLs
 ################################################################################
 
-resource "aws_default_network_acl" "this" {
+resource "aws_default_network_acl" "my_default_network_acl" {
   count = var.create_vpc && var.manage_default_network_acl ? 1 : 0
 
-  default_network_acl_id = element(concat(aws_vpc.this.*.default_network_acl_id, [""]), 0)
+  default_network_acl_id = aws_vpc.mainvpc.default_network_acl_id
 
-  # The value of subnet_ids should be any subnet IDs that are not set as subnet_ids
-  #   for any of the non-default network ACLs
-  subnet_ids = setsubtract(
-    compact(flatten([
-      aws_subnet.public.*.id,
-      aws_subnet.private.*.id,
-      aws_subnet.intra.*.id,
-      aws_subnet.database.*.id,
-      aws_subnet.redshift.*.id,
-      aws_subnet.elasticache.*.id,
-      aws_subnet.outpost.*.id,
-    ])),
-    compact(flatten([
-      aws_network_acl.public.*.subnet_ids,
-      aws_network_acl.private.*.subnet_ids,
-      aws_network_acl.intra.*.subnet_ids,
-      aws_network_acl.database.*.subnet_ids,
-      aws_network_acl.redshift.*.subnet_ids,
-      aws_network_acl.elasticache.*.subnet_ids,
-      aws_network_acl.outpost.*.subnet_ids,
-    ]))
-  )
-
-  dynamic "ingress" {
-    for_each = var.default_network_acl_ingress
-    content {
-      action          = ingress.value.action
-      cidr_block      = lookup(ingress.value, "cidr_block", null)
-      from_port       = ingress.value.from_port
-      icmp_code       = lookup(ingress.value, "icmp_code", null)
-      icmp_type       = lookup(ingress.value, "icmp_type", null)
-      ipv6_cidr_block = lookup(ingress.value, "ipv6_cidr_block", null)
-      protocol        = ingress.value.protocol
-      rule_no         = ingress.value.rule_no
-      to_port         = ingress.value.to_port
-    }
-  }
-  dynamic "egress" {
-    for_each = var.default_network_acl_egress
-    content {
-      action          = egress.value.action
-      cidr_block      = lookup(egress.value, "cidr_block", null)
-      from_port       = egress.value.from_port
-      icmp_code       = lookup(egress.value, "icmp_code", null)
-      icmp_type       = lookup(egress.value, "icmp_type", null)
-      ipv6_cidr_block = lookup(egress.value, "ipv6_cidr_block", null)
-      protocol        = egress.value.protocol
-      rule_no         = egress.value.rule_no
-      to_port         = egress.value.to_port
-    }
-  }
-
-  tags = merge(
-    {
-      "Name" = format("%s", var.default_network_acl_name)
-    },
-    var.tags,
-    var.default_network_acl_tags,
-  )
-}
-
+  
 ################################################################################
 # Public Network ACLs
 ################################################################################
