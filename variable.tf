@@ -150,3 +150,26 @@ variable "db_subnet_group_name" {
   default = "my_subnet_group"
 }
 
+variable "manage_default_network_acl" {
+  description = "Specify whether default network ACL is required"
+  type = bool
+  default = true
+}
+
+variable "public_dedicated_network_acl" {
+  description = "Whether public dedicated NACL is required"
+  type = bool
+  default = true
+}
+
+variable "public_network_acl_tag" {
+  description = "Tag for the public network acl"
+  type = string
+  default = "My public NACL"
+}
+
+variable "public_inbound_acl_rules" {
+  description = "Public inbound ACL rule"
+  type = map(string)
+  default = {
+    "
