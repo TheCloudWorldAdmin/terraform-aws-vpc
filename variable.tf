@@ -1,3 +1,8 @@
+variable "region_name" {
+  description = "Region Name"
+  type = string
+  default = "us-east-1"
+}
 variable "create_vpc" {
   description = "Whether the VPC is getting created"
   type = bool
