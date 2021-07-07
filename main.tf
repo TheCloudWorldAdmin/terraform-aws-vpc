@@ -214,7 +214,7 @@ resource "aws_eip" "nat_eip" {
 }
 }
 locals {
-  total_ip = [aws_eip.nat_eip.id]
+  total_ip = aws_eip.nat_eip.id[count.index]
   total_subnets = [aws_subnet.private.*.id, aws_subnet.database.*.id]
 }
 resource "aws_nat_gateway" "my_nat" {
