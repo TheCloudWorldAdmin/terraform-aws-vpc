@@ -35,7 +35,7 @@ resource "aws_vpc_ipv4_cidr_block_association" "vpc_ipv4_cidr_association" {
 ################################################################################
 
 locals {
-  default_security_group_ingress = [{
+  default_security_group_ingress = {
     description = "Ingress default security group"
     from_port = var.ingress_from_port
     to_port = var.ingress_to_port
@@ -43,16 +43,18 @@ locals {
     ipv6_cidr_blocks = var.ingress_ipv6_cidr_blocks
     prefix_list_ids = var.ingress_prefix_list_ids
     security_groups = var.ingress_security_groups
-}],
-  default_security_group_egress = [{  
-    description = "Ingress default security group"
-    from_port = var.ingress_from_port
-    to_port = var.ingress_to_port
-    protocol = var.ingress_protocol
-    ipv6_cidr_blocks = var.ingress_ipv6_cidr_blocks
-    prefix_list_ids = var.ingress_prefix_list_ids
-    security_groups = var.ingress_security_groups
-}]
+}
+}
+locals {
+  default_security_group_egress = {  
+    description = "Egress default security group"
+    from_port = var.egress_from_port
+    to_port = var.egress_to_port
+    protocol = var.egress_protocol
+    ipv6_cidr_blocks = var.egress_ipv6_cidr_blocks
+    prefix_list_ids = var.egress_prefix_list_ids
+    security_groups = var.egress_security_groups
+}
 }
 
 resource "aws_default_security_group" "this" {
