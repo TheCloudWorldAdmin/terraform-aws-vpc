@@ -389,7 +389,7 @@ resource "aws_db_subnet_group" "database_subnet_group" {
 
   name        = var.db_subnet_group_name
   description = "Database subnet group for ${var.db_subnet_group_name}"
-  subnet_ids  = [data.aws_subnet_ids.subnet_ids]
+  subnet_ids  = [data.aws_subnet_ids.subnet_ids.ids]
   tags = {
     "Name" = var.db_subnet_group_name
   }
