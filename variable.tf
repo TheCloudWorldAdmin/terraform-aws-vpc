@@ -179,7 +179,7 @@ variable "private_subnet_count" {
 }
 variable "database_subnets" {
   description = "CIDR block for database subnet"
-  type = string
+  type = list
   default = ["10.0.4.0/24", "10.0.5.0/24"]
 }
 variable "private_dedicated_network_acl" {
