@@ -17,7 +17,7 @@ resource "aws_vpc" "myVPC" {
     Name = var.vpc_name
   
 }
-
+}
 locals {
   another_cidr = var.another_cidr
 }
