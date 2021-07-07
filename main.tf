@@ -239,7 +239,7 @@ locals {
 resource "aws_route" "private_nat_gateway" {
   count = var.create_vpc && var.enable_nat_gateway ? var.nat_gateway_count : 0
 
-  route_table_id         = 
+  route_table_id         = aws_route_table.private.*.id
   destination_cidr_block = "0.0.0.0/0"
   dynamic "nat_attach_rt" {
     for_each = local.total_nat
