@@ -360,7 +360,7 @@ resource "aws_subnet" "private" {
 ################################################################################
 
 resource "aws_subnet" "database" {
-count = 2
+  count = var.create_vpc ? 2 : 0
   vpc_id                          = aws_vpc.myVPC.id
   cidr_block                      = var.database_subnets
   availability_zone               = data.aws_availability_zones.available.names[count.index]
@@ -381,7 +381,7 @@ resource "aws_db_subnet_group" "database_subnet_group" {
 
   name        = var.db_subnet_group_name
   description = "Database subnet group for ${var.db_subnet_group_name}"
-  subnet_ids  = [aws_subnet.database[count.index]]
+  subnet_ids  = [aws_subnet.database.*.id]
   tags = {
     "Name" = var.db_subnet_group_name
   }
