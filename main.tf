@@ -101,7 +101,7 @@ output "subnet_cidr_blocks" {
 
 resource "aws_db_subnet_group" "database_subnet_group" {
   
-  subnet_ids  = [for s in local.db_group : s.id]
+  subnet_ids  = [for s in aws_subnet.subnet : s.id]
   name        = var.db_subnet_group_name
   description = "Database subnet group for ${var.db_subnet_group_name}"
   tags = {
