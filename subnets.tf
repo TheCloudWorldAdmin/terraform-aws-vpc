@@ -82,7 +82,7 @@ resource "aws_subnet" "database" {
   
 resource "aws_db_subnet_group" "database_subnet_group" {
   
- for_each = aws_subnet.database.ids
+ for_each = aws_subnet.database[count.index]
  subnet_ids = [each.value]
  # subnet_ids  = [for s in data.aws_subnet.subnet : s.id]
   name        = var.db_subnet_group_name
