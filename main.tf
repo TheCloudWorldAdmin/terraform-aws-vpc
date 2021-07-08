@@ -77,52 +77,7 @@ resource "aws_egress_only_internet_gateway" "my_egress_IGW" {
 }
 } 
 
-################################################################################
-# Default route
-################################################################################
-# locals {
-#  default_route_table_routes = [{
-#    cidr_block = var.cidr_block_default_route_table
-#    ipv6_cidr_block = var.ipv6_cidr_block_route
-#    egress_only_gateway_id = var.egress_only_gateway_id_route
-#    gateway_id = var.gateway_id_route
-#    instance_id = var.instance_id_route
-#    nat_gateway_id = var.nat_gateway_id_route
-#    network_interface_id = var.network_interface_id_route
-#    transit_gateway_id = var.transit_gateway_id_route
-#    vpc_endpoint_id = var.vpc_endpoint_id_route
-#    vpc_peering_connection_id = var.vpc_peering_connection_id_route
-#  }]
-#  }  
-#resource "aws_default_route_table" "default_route_table" {
- # count = var.create_vpc && var.manage_default_route_table ? 1 : 0
 
-#  default_route_table_id = aws_vpc.myVPC.default_route_table_id
-  #propagating_vgws       = var.default_route_table_propagating_vgws
-
-#  dynamic "route" {
-#    for_each = var.default_route_table_routes
-#    content {
-#      # One of the following destinations must be provided
-#      cidr_block      = route.value.cidr_block
-#      ipv6_cidr_block = lookup(route.value, "ipv6_cidr_block", null)
-
-#      # One of the following targets must be provided
-#      egress_only_gateway_id    = lookup(route.value, "egress_only_gateway_id", null)
-#      gateway_id                = lookup(route.value, "gateway_id", null)
-#      instance_id               = lookup(route.value, "instance_id", null)
-#      nat_gateway_id            = lookup(route.value, "nat_gateway_id", null)
-#      network_interface_id      = lookup(route.value, "network_interface_id", null)
-#      transit_gateway_id        = lookup(route.value, "transit_gateway_id", null)
-#      vpc_endpoint_id           = lookup(route.value, "vpc_endpoint_id", null)
-#      vpc_peering_connection_id = lookup(route.value, "vpc_peering_connection_id", null)
-#    }
-#  }
-
-#  tags = {
-#    "Name" = var.default_route_table_tag
-#}
-#}
 
 ################################################################################
 # Defaults
