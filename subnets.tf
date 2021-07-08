@@ -84,7 +84,7 @@ resource "aws_db_subnet_group" "database_subnet_group" {
   
  #for_each = aws_subnet.database[count.index]
  #subnet_ids = [each.value]
- subnet_ids  = [for s in aws_subnet.database.ids : s.id]
+ subnet_ids  = [for s in aws_subnet.database[count.index] : s.id]
   name        = var.db_subnet_group_name
   description = "Database subnet group for ${var.db_subnet_group_name}"
   tags = {
