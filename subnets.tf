@@ -79,7 +79,12 @@ resource "aws_subnet" "database" {
 #output "subnet_cidr_blocks" {
 #  value = [for s in data.aws_subnet.subnet : s.id]
 #}
-  
+locals {
+ db_group = {
+  for_each = aws_subnet.database[count.index]
+  id = each.value
+}
+} 
 resource "aws_db_subnet_group" "database_subnet_group" {
   
  #for_each = aws_subnet.database[count.index]
