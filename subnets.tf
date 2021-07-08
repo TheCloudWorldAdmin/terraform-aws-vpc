@@ -62,27 +62,29 @@ resource "aws_subnet" "database" {
 ################################################################################
 # Database subnet Group for RDS
 ################################################################################
-data "aws_subnet_ids" "subnet_ids" {
-  vpc_id = aws_vpc.myVPC.id
+#data "aws_subnet_ids" "subnet_ids" {
+#  vpc_id = aws_vpc.myVPC.id
   
-    filter {
-    name   = "tag:Name"
-    values = [var.database_subnet_tag] # insert values here
-  }
-}
+#    filter {
+#    name   = "tag:Name"
+#    values = [var.database_subnet_tag] # insert values here
+#  }
+#}
 
-data "aws_subnet" "subnet" {
-  for_each = data.aws_subnet_ids.subnet_ids.ids
-  id       = each.value
-}
+#data "aws_subnet" "subnet" {
+#  for_each = data.aws_subnet_ids.subnet_ids.ids
+#  id       = each.value
+#}
 
-output "subnet_cidr_blocks" {
-  value = [for s in data.aws_subnet.subnet : s.id]
-}
+#output "subnet_cidr_blocks" {
+#  value = [for s in data.aws_subnet.subnet : s.id]
+#}
   
 resource "aws_db_subnet_group" "database_subnet_group" {
   
-  subnet_ids  = [for s in data.aws_subnet.subnet : s.id]
+ for_each = aws_subnet.database.ids
+ subnet_ids = [each.value]
+ # subnet_ids  = [for s in data.aws_subnet.subnet : s.id]
   name        = var.db_subnet_group_name
   description = "Database subnet group for ${var.db_subnet_group_name}"
   tags = {
